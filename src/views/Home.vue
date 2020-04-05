@@ -2,7 +2,9 @@
   <div>
     <h1 class="title">Corona Tracker</h1>
     <Overall :overall="overall"/>
+    
     <Statistics :summary="summary" :header="header"/>
+    
   </div>
 </template>
 
@@ -59,6 +61,15 @@ export default {
           key: 'TotalRecovered',
           sortable: true
         },
+        {
+          key: 'RecoveryRate',
+          label: 'Recovery Rate (%)',
+          sortable: true
+        },
+        {
+          key: 'actions',
+          label: 'Action',
+        },
       ],
       
     }
@@ -95,24 +106,28 @@ export default {
       let doc = await this.axios.get(this.url + 'summary');
       let lists = doc.data.Countries;
       lists.forEach((list, index) =>{
-        delete list.Slug;
+        list._cellVariants = {};
         if(index > 1){
-          if(list.NewConfirmed < 1){
-            list._cellVariants = {
-              NewConfirmed: 'success'
-            }
-          }
-          else{
-            // list.NewConfirmed = '+' + list.NewConfirmed;
+          if(list.NewConfirmed > 0){
+            list._cellVariants.NewConfirmed = 'warning'
           }
           if(list.NewDeaths > 0){
-            list._cellVariants = {
-              NewDeaths: 'danger'
-            }
+            list._cellVariants.NewDeaths = 'danger'
+          }
+          if(list.NewRecovered > 0){
+            list._cellVariants.NewRecovered = 'info'
           }
           if(list.TotalConfirmed == list.TotalRecovered){
             list._rowVariant = 'success'
           }
+          let recoveredPercentage = list.TotalRecovered / list.TotalConfirmed * 100;
+          list.RecoveryRate = recoveredPercentage || recoveredPercentage == 0 ? parseFloat(recoveredPercentage).toFixed(2) : 'N/A';
+
+          let buttons = 
+            {
+              text: 'Details',
+            }
+          list.actions = buttons;
           overallSummary.activeCases.totalCase += list.TotalConfirmed;
           overallSummary.deathCases.totalCase += list.TotalDeaths;
           overallSummary.recoveredCases.totalCase += list.TotalRecovered;
@@ -125,11 +140,9 @@ export default {
       })
       this.totalCasesCounter(overallSummary);
       this.newCasesCounter(overallSummary);
-      this.filteredList = this.summary;
     },
     totalCasesCounter(data){
       let incrementSpeed = 200
-      console.log(data);
       let totalCasesCount = setInterval(_ =>{
         let increment = parseInt(data.activeCases.totalCase/incrementSpeed);
         if(this.overall.activeCases.totalCase <= data.activeCases.totalCase){

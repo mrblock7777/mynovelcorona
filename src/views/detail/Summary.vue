@@ -4,15 +4,12 @@
         <b-card 
             header-tag="header"
             :header="title | formatCamelCase | capitalize"
-            :header-bg-variant="value.color"
+            :header-bg-variant="checkTitle(title)"
             :header-text-variant="value.color != 'warning' ? 'white' : ''"
             >
             <b-card-title>
-                {{ value.totalCase }}
+                {{ value }}
             </b-card-title>
-            <b-card-text>
-                New: {{ value.newCase }}
-            </b-card-text>
         </b-card>
         </b-col>
     </b-row>
@@ -20,6 +17,11 @@
 <script>
 export default {
    props:['overall'],
+   methods:{
+       checkTitle(title){
+           return title == 'active' ? 'warning' : title == 'death' ? 'danger' : 'success'
+       }
+   },
    filters:{
     capitalize(str){
       return str.charAt(0).toUpperCase() + str.substring(1);

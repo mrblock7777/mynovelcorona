@@ -14,6 +14,17 @@ import store from './store'
 import axios from 'axios';
 
 Vue.config.productionTip = false
+const requireComponent = require.context(
+  './components',
+  false,
+  /[A-Z]\w+\.(vue|js)$/
+)
+requireComponent.keys().forEach(fileName =>{
+  const componentConfig = requireComponent(fileName);
+  const componentName = fileName.replace(/^\.\//, '').replace(/\.\w+$/, '').split('-').join('');
+
+  Vue.component(componentName, componentConfig.default || componentConfig);
+})
 Vue.component('apexchart',VueApexChart)
 Vue.use(VueFusionChart, FusionChart, Column2D, FusionTheme)
 Vue.use(BootstrapVue);
