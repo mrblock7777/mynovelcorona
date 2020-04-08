@@ -8,5 +8,8 @@
     "start": "node server.js"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@types/fusioncharts": "^3.11.5"
+  }
 }
