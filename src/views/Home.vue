@@ -1,85 +1,87 @@
 <template>
   <div>
     <h1 class="title">Corona Tracker</h1>
-    <Overall :overall="overall"/>
-    
-    <Statistics :summary="summary" :header="header"/>
-    
+    <h2>Summary</h2>
+    <Overall :overall="overall" />
+    <Statistics :summary="summary" :header="header" />
+    <Analysis />
   </div>
 </template>
 
 <script>
-import Overall from './summary/Overall';
-import Statistics from './summary/Statistics';
+import Overall from "./summary/Overall";
+import Statistics from "./summary/Statistics";
+import Analysis from "./summary/Analysis";
+import Chronology from './summary/Chronology';
 export default {
-  data(){
-    return{
+  data() {
+    return {
       summary: [],
-      overall:{
+      overall: {
         activeCases: {
           newCase: 0,
           totalCase: 0,
-          color: 'warning'
+          color: "warning"
         },
         deathCases: {
           newCase: 0,
           totalCase: 0,
-          color: 'danger'
+          color: "danger"
         },
         recoveredCases: {
           newCase: 0,
           totalCase: 0,
-          color: 'success'
+          color: "success"
         }
       },
       header: [
         {
-          key: 'Country',
+          key: "Country",
           sortable: true
         },
         {
-          key: 'NewConfirmed',
+          key: "NewConfirmed",
           sortable: true
         },
         {
-          key: 'TotalConfirmed',
+          key: "TotalConfirmed",
           sortable: true
         },
         {
-          key: 'NewDeaths',
+          key: "NewDeaths",
           sortable: true
         },
         {
-          key: 'TotalDeaths',
+          key: "TotalDeaths",
           sortable: true
         },
         {
-          key: 'NewRecovered',
+          key: "NewRecovered",
           sortable: true
         },
         {
-          key: 'TotalRecovered',
+          key: "TotalRecovered",
           sortable: true
         },
         {
-          key: 'RecoveryRate',
-          label: 'Recovery Rate (%)',
+          key: "RecoveryRate",
+          label: "Recovery Rate (%)",
           sortable: true
         },
         {
-          key: 'actions',
-          label: 'Action',
-        },
-      ],
-      
-    }
+          key: "actions",
+          label: "Action"
+        }
+      ]
+    };
   },
-  components:{
+  components: {
     Overall,
-    Statistics
+    Statistics,
+    Analysis
   },
-  methods:{
-    async getSummary(){
+  methods: {
+    async getSummary() {
       this.summary = [];
       this.overall.activeCases.totalCase = 0;
       this.overall.deathCases.totalCase = 0;
@@ -92,149 +94,138 @@ export default {
       let overallSummary = {
         activeCases: {
           newCase: 0,
-          totalCase: 0,
+          totalCase: 0
         },
         deathCases: {
           newCase: 0,
-          totalCase: 0,
+          totalCase: 0
         },
         recoveredCases: {
           newCase: 0,
-          totalCase: 0,
-        },
-      }
-      let doc = await this.axios.get(this.url + 'summary');
+          totalCase: 0
+        }
+      };
+      let doc = await this.axios.get(this.url + "summary");
       let lists = doc.data.Countries;
-      lists.forEach((list, index) =>{
+      lists.forEach((list, index) => {
         list._cellVariants = {};
-        if(index > 1){
-          if(list.NewConfirmed > 0){
-            list._cellVariants.NewConfirmed = 'warning'
-          }
-          if(list.NewDeaths > 0){
-            list._cellVariants.NewDeaths = 'danger'
-          }
-          if(list.NewRecovered > 0){
-            list._cellVariants.NewRecovered = 'info'
-          }
-          if(list.TotalConfirmed == list.TotalRecovered){
-            list._rowVariant = 'success'
-          }
-          let recoveredPercentage = list.TotalRecovered / list.TotalConfirmed * 100;
-          list.RecoveryRate = recoveredPercentage || recoveredPercentage == 0 ? parseFloat(recoveredPercentage).toFixed(2) : 'N/A';
 
-          let buttons = 
-            {
-              text: 'Details',
-            }
-          list.actions = buttons;
-          overallSummary.activeCases.totalCase += list.TotalConfirmed;
-          overallSummary.deathCases.totalCase += list.TotalDeaths;
-          overallSummary.recoveredCases.totalCase += list.TotalRecovered;
-
-          overallSummary.activeCases.newCase += list.NewConfirmed;
-          overallSummary.deathCases.newCase += list.NewDeaths;
-          overallSummary.recoveredCases.newCase += list.NewRecovered;
-          this.summary.push(list);
+        if (list.NewConfirmed > 0) {
+          list._cellVariants.NewConfirmed = "warning";
         }
-      })
-      this.totalCasesCounter(overallSummary);
-      this.newCasesCounter(overallSummary);
+        if (list.NewDeaths > 0) {
+          list._cellVariants.NewDeaths = "danger";
+        }
+        if (list.NewRecovered > 0) {
+          list._cellVariants.NewRecovered = "info";
+        }
+        if (list.TotalConfirmed == list.TotalRecovered) {
+          list._rowVariant = "success";
+        }
+        let recoveredPercentage =
+          (list.TotalRecovered / list.TotalConfirmed) * 100;
+        list.RecoveryRate =
+          recoveredPercentage || recoveredPercentage == 0
+            ? parseFloat(recoveredPercentage).toFixed(2)
+            : "N/A";
+
+        let buttons = {
+          text: "Details"
+        };
+        list.actions = buttons;
+        overallSummary.activeCases.totalCase += list.TotalConfirmed;
+        overallSummary.deathCases.totalCase += list.TotalDeaths;
+        overallSummary.recoveredCases.totalCase += list.TotalRecovered;
+
+        overallSummary.activeCases.newCase += list.NewConfirmed;
+        overallSummary.deathCases.newCase += list.NewDeaths;
+        overallSummary.recoveredCases.newCase += list.NewRecovered;
+        this.summary.push(list);
+      });
+      this.totalCasesCounter(doc.data.Global);
+      this.newCasesCounter(doc.data.Global);
     },
-    totalCasesCounter(data){
-      let incrementSpeed = 200
-      let totalCasesCount = setInterval(_ =>{
-        let increment = parseInt(data.activeCases.totalCase/incrementSpeed);
-        if(this.overall.activeCases.totalCase <= data.activeCases.totalCase){
+    totalCasesCounter(data) {
+      let incrementSpeed = 200;
+      let totalCasesCount = setInterval(_ => {
+        let increment = parseInt(data.TotalConfirmed / incrementSpeed);
+        if (this.overall.activeCases.totalCase <= data.TotalConfirmed) {
           this.overall.activeCases.totalCase += increment;
-        }
-        else{
-          let difference = this.overall.activeCases.totalCase - data.activeCases.totalCase;
+        } else {
+          let difference =
+            this.overall.activeCases.totalCase - data.TotalConfirmed;
           this.overall.activeCases.totalCase -= difference;
           clearInterval(totalCasesCount);
         }
+      }, 1000 / data.TotalConfirmed);
 
-      }, 1000/data.activeCases.totalCase)
-
-      let totalDeathsCount = setInterval(_ =>{
-        let increment = parseInt(data.deathCases.totalCase/incrementSpeed);
-        if(this.overall.deathCases.totalCase <= data.deathCases.totalCase){
+      let totalDeathsCount = setInterval(_ => {
+        let increment = parseInt(data.TotalDeaths / incrementSpeed);
+        if (this.overall.deathCases.totalCase <= data.TotalDeaths) {
           this.overall.deathCases.totalCase += increment;
-        }
-        else{
-          let difference = this.overall.deathCases.totalCase - data.deathCases.totalCase;
+        } else {
+          let difference = this.overall.deathCases.totalCase - data.TotalDeaths;
           this.overall.deathCases.totalCase -= difference;
           clearInterval(totalDeathsCount);
         }
+      }, 1000 / data.TotalDeaths);
 
-      }, 1000/data.deathCases.totalCase)
-
-      let totalRecoveredCount = setInterval(_ =>{
-        let increment = parseInt(data.recoveredCases.totalCase/incrementSpeed);
-        if(this.overall.recoveredCases.totalCase <= data.recoveredCases.totalCase){
+      let totalRecoveredCount = setInterval(_ => {
+        let increment = parseInt(data.TotalRecovered / incrementSpeed);
+        if (this.overall.recoveredCases.totalCase <= data.TotalRecovered) {
           this.overall.recoveredCases.totalCase += increment;
-        }
-        else{
-          let difference = this.overall.recoveredCases.totalCase - data.recoveredCases.totalCase;
+        } else {
+          let difference =
+            this.overall.recoveredCases.totalCase - data.TotalRecovered;
           this.overall.recoveredCases.totalCase -= difference;
           clearInterval(totalRecoveredCount);
         }
-
-      }, 1000/data.recoveredCases.totalCase)
-
-      
+      }, 1000 / data.TotalRecovered);
     },
-    newCasesCounter(data){
-      let incrementSpeed = 200
-      
-      let totalCasesCount = setInterval(_ =>{
-        let increment = parseInt(data.activeCases.newCase / incrementSpeed);
-        if(this.overall.activeCases.newCase <= data.activeCases.newCase){
+    newCasesCounter(data) {
+      let incrementSpeed = 200;
+
+      let totalCasesCount = setInterval(_ => {
+        let increment = parseInt(data.NewConfirmed / incrementSpeed);
+        if (this.overall.activeCases.newCase <= data.NewConfirmed) {
           this.overall.activeCases.newCase += increment;
-        }
-        else{
-          let difference = this.overall.activeCases.newCase - data.activeCases.newCase;
+        } else {
+          let difference = this.overall.activeCases.newCase - data.NewConfirmed;
           this.overall.activeCases.newCase -= difference;
           clearInterval(totalCasesCount);
         }
+      }, 1000 / data.NewConfirmed);
 
-      }, 1000/data.activeCases.newCase)
-      
-      let totalDeathsCount = setInterval(_ =>{
-        let increment = parseInt(data.deathCases.newCase/incrementSpeed);
-        if(this.overall.deathCases.newCase <= data.deathCases.newCase){
+      let totalDeathsCount = setInterval(_ => {
+        let increment = parseInt(data.NewDeaths / incrementSpeed);
+        if (this.overall.deathCases.newCase <= data.NewDeaths) {
           this.overall.deathCases.newCase += increment;
-        }
-        else{
-          let difference = this.overall.deathCases.newCase - data.deathCases.newCase;
+        } else {
+          let difference = this.overall.deathCases.newCase - data.NewDeaths;
           this.overall.deathCases.newCase -= difference;
           clearInterval(totalDeathsCount);
         }
+      }, 1000 / data.NewDeaths);
 
-      }, 1000/data.deathCases.newCase)
-
-      let totalRecoveredCount = setInterval(_ =>{
-        let increment = parseInt(data.recoveredCases.newCase/incrementSpeed);
-        if(this.overall.recoveredCases.newCase <= data.recoveredCases.newCase){
+      let totalRecoveredCount = setInterval(_ => {
+        let increment = parseInt(data.NewDeaths / incrementSpeed);
+        if (this.overall.recoveredCases.newCase <= data.NewDeaths) {
           this.overall.recoveredCases.newCase += increment;
-        }
-        else{
-          let difference = this.overall.recoveredCases.newCase - data.recoveredCases.newCase;
+        } else {
+          let difference = this.overall.recoveredCases.newCase - data.NewDeaths;
           this.overall.recoveredCases.newCase -= difference;
           clearInterval(totalRecoveredCount);
         }
-
-      }, 1000/data.recoveredCases.newCase)
-
-    },
+      }, 1000 / data.NewDeaths);
+    }
   },
-  beforeMount(){
+  beforeMount() {
     this.getSummary();
   }
-}
+};
 </script>
 <style lang="scss" scoped>
-  .title{
-    text-align: center;
-  }
+.title {
+  text-align: center;
+}
 </style>
