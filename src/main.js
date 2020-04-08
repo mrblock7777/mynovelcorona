@@ -8,7 +8,7 @@ import Column2D from 'fusioncharts/fusioncharts.charts';
 import FusionTheme from 'fusioncharts/themes/fusioncharts.theme.fusion'
 import FusionMaps from 'fusioncharts/fusioncharts.maps'
 import World from 'fusioncharts/maps/fusioncharts.world'
-const WorldWithCountries = require('fusioncharts/maps/fusioncharts.worldwithcountries')
+import WorldWithCountries from 'fusioncharts/maps/fusioncharts.worldwithcountries'
 
 import './registerServiceWorker'
 import 'bootstrap/dist/css/bootstrap.css';
