@@ -1,7 +1,7 @@
 <template>
   <div>
     <Confirmed v-if="filteredData.length" :data="filteredData" />
-    <Recovered v-if="filteredData.length" :data="filteredData"/>
+    <!-- <Recovered v-if="filteredData.length" :data="filteredData"/> -->
   </div>
 </template>
 <script>

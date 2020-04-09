@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <fusioncharts
-      class="confirmed"
-      type="worldwithcountries"
-      width="100%"
-      height="700"
-      data-format="json"
-      :dataSource="source"
+  <div class="map">
+    <h4 class="text-center">Total Active Cases Around The World</h4>
+    <mapchart
+      :country-data="confirmedData"
+      id="confirmed-map"
+      low-color="#fff8bf"
+      high-color="#ffe330"
+      :chromaScaleOn="true"
     />
   </div>
 </template>
@@ -15,6 +15,7 @@ export default {
   props: ["data"],
   data() {
     return {
+      confirmedData: {},
       source: {
         chart: {
           caption: "Total COVID-19 Cases Around The World",
@@ -75,9 +76,8 @@ export default {
     },
     processData() {
       this.data.forEach(item => {
-        this.source.data.push({
-          id: item.id,
-          value: item.TotalConfirmed.toString()
+        this.confirmedData = Object.assign({}, this.confirmedData, {
+          [item.CountryCode]: item.TotalConfirmed
         });
       });
     }
@@ -87,3 +87,11 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+// #confirmed-map {
+//   height: 100vh;
+// }
+.map{
+  height: 100vh
+}
+</style>

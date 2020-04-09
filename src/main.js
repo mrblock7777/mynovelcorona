@@ -2,14 +2,14 @@ import Vue from 'vue'
 import App from './App.vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import VueApexChart from 'vue-apexcharts'
-import FusionChart from 'fusioncharts';
-import VueFusionChart from 'vue-fusioncharts'
-import Column2D from 'fusioncharts/fusioncharts.charts';
-import FusionTheme from 'fusioncharts/themes/fusioncharts.theme.fusion'
-import FusionMaps from 'fusioncharts/fusioncharts.maps'
-import World from 'fusioncharts/maps/fusioncharts.world'
-import WorldWithCountries from 'fusioncharts/maps/fusioncharts.worldwithcountries'
-
+// import FusionChart from 'fusioncharts';
+// import VueFusionChart from 'vue-fusioncharts'
+// import Column2D from 'fusioncharts/fusioncharts.charts';
+// import FusionTheme from 'fusioncharts/themes/fusioncharts.theme.fusion'
+// import FusionMaps from 'fusioncharts/fusioncharts.maps'
+// import World from 'fusioncharts/maps/fusioncharts.world'
+// import WorldWithCountries from 'fusioncharts/maps/fusioncharts.worldwithcountries'
+import MapChart from 'vue-map-chart';
 import './registerServiceWorker'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -30,12 +30,12 @@ requireComponent.keys().forEach(fileName =>{
   Vue.component(componentName, componentConfig.default || componentConfig);
 })
 Vue.component('apexchart',VueApexChart)
-Vue.use(VueFusionChart, FusionChart, Column2D, FusionMaps, World, WorldWithCountries, FusionTheme)
+Vue.component('mapchart', MapChart);
+// Vue.use(VueFusionChart, FusionChart, Column2D, FusionMaps, World, WorldWithCountries, FusionTheme)
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.prototype.axios = axios;
 Vue.prototype.url = 'https://api.covid19api.com/'
-Vue.prototype.fusioncharts = FusionChart;
 new Vue({
   router,
   store,

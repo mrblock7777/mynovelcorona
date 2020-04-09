@@ -1,12 +1,11 @@
 <template>
   <div>
-    <fusioncharts
-      class="confirmed"
-      type="worldwithcountries"
-      width="100%"
-      height="700"
-      data-format="json"
-      :dataSource="source"
+    <mapchart
+      :country-data="recoveredData"
+      id="map"
+      low-color="#449445"
+      high-color="#009602"
+      show-legend
     />
   </div>
 </template>
@@ -15,6 +14,7 @@ export default {
   props: ["data"],
   data() {
     return {
+      recoveredData: {},
       source: {
         chart: {
           caption: "Recovery Rate(%) Around The World",
@@ -63,7 +63,7 @@ export default {
             {
               maxvalue: "100",
               color: "#006e09"
-            },
+            }
           ]
         },
         data: []
@@ -79,11 +79,10 @@ export default {
     },
     processData() {
       this.data.forEach(item => {
-          let percentage = item.TotalRecovered /item.TotalConfirmed * 100;
-          let fixedPercentage = parseFloat(percentage).toFixed(2);
-        this.source.data.push({
-          id: item.id,
-          value: fixedPercentage,
+        let percentage = (item.TotalRecovered / item.TotalConfirmed) * 100;
+        let fixed = parseFloat(percentage).toFixed(2);
+        this.recoveredData = Object.assign({}, this.recoveredData, {
+          [item.CountryCode]: percentage
         });
       });
     }
@@ -93,3 +92,8 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+#map {
+  height: 100vh;
+}
+</style>
