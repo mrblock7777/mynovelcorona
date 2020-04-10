@@ -5,6 +5,7 @@
     <Overall v-if="!loading" :overall="overall" />
     <Statistics v-if="!loading" :summary="summary" :header="header" />
     <p v-else>Loading data...</p>
+    <p v-if="error">Load Error. Please refresh.</p>
     <Analysis />
   </div>
 </template>
@@ -18,6 +19,7 @@ export default {
   data() {
     return {
       loading: false,
+      error: false,
       summary: [],
       overall: {
         activeCases: {
@@ -108,7 +110,10 @@ export default {
           totalCase: 0
         }
       };
-      let doc = await this.axios.get(this.url + "summary");
+      let doc = await this.axios.get(this.url + "summary").catch(e=> {
+        this.loading = false;
+        this.error = true;
+      });
       let lists = doc.data.Countries;
       lists.forEach((list, index) => {
         list._cellVariants = {};

@@ -11,6 +11,11 @@ export default {
       series: [],
       chartOptions: {
         labels: [],
+        chart:{
+          toolbar:{
+            show: false
+          }
+        },
         colors: ["#a87c00"],
         dataLabels:{
             enabled: false

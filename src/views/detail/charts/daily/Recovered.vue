@@ -10,6 +10,11 @@ export default {
     return {
       series: [],
       chartOptions: {
+        chart:{
+          toolbar:{
+            show: false
+          }
+        },
         labels: [],
         colors: ["#5bc76a"],
         dataLabels: {
@@ -44,7 +49,7 @@ export default {
           let dailyCases = this.detail[i + 1].Cases - detail.Cases;
           let date = new Date(this.detail[i + 1].Date);
           let dataWithDate = [date.getTime(), dailyCases];
-          if(dailyCases > 0){
+          if (dailyCases > 0) {
             data.unshift(dataWithDate);
           }
         }

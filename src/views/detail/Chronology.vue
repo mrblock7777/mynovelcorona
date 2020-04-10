@@ -1,10 +1,10 @@
 <template>
   <div>
     <b-row>
-      <b-col>
+      <b-col  sm >
         <Cases :detail="detail" />
       </b-col>
-      <b-col>
+      <b-col  sm >
         <Realtime :detail="detail.activeCases"/>
       </b-col>
     </b-row>
