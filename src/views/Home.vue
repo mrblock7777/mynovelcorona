@@ -2,8 +2,9 @@
   <div>
     <h1 class="title">Corona Tracker</h1>
     <h2>Summary</h2>
-    <Overall :overall="overall" />
-    <Statistics :summary="summary" :header="header" />
+    <Overall v-if="!loading" :overall="overall" />
+    <Statistics v-if="!loading" :summary="summary" :header="header" />
+    <p v-else>Loading data...</p>
     <Analysis />
   </div>
 </template>
@@ -16,6 +17,7 @@ import Chronology from './summary/Chronology';
 export default {
   data() {
     return {
+      loading: false,
       summary: [],
       overall: {
         activeCases: {
@@ -82,6 +84,7 @@ export default {
   },
   methods: {
     async getSummary() {
+      this.loading = true;
       this.summary = [];
       this.overall.activeCases.totalCase = 0;
       this.overall.deathCases.totalCase = 0;
@@ -144,6 +147,7 @@ export default {
       });
       this.totalCasesCounter(doc.data.Global);
       this.newCasesCounter(doc.data.Global);
+      this.loading = false
     },
     totalCasesCounter(data) {
       let incrementSpeed = 200;

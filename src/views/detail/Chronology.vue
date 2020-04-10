@@ -5,7 +5,7 @@
         <Cases :detail="detail" />
       </b-col>
       <b-col>
-        <Realtime :detail="detail.activeCases" />
+        <Realtime :detail="detail.activeCases"/>
       </b-col>
     </b-row>
   </div>

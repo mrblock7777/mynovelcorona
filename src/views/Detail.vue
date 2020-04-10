@@ -1,13 +1,18 @@
 <template>
   <div>
     <h1 class="title">Cases In {{ countryName | reformat | capitalize }}</h1>
-    <Summary v-if="!loading" :overall="latestCase" />
-    <Chronology v-if="!loading" :detail="detail" />
+    <div v-if="!loading">
+      <Summary :overall="latestCase" />
+      <Chronology :detail="detail" />
+      <Daily :detail="detail"/>
+    </div>
+    <p v-else>Loading Summary...</p>
   </div>
 </template>
 <script>
 import Summary from "./detail/Summary";
 import Chronology from "./detail/Chronology";
+import Daily from "./detail/Daily";
 export default {
   data() {
     return {
@@ -28,7 +33,8 @@ export default {
   },
   components: {
     Summary,
-    Chronology
+    Chronology,
+    Daily
   },
   methods: {
     requestData(status) {
@@ -41,9 +47,10 @@ export default {
       );
     },
     getLatestCases() {
-      this.latestCase.active = this.detail.activeCases.pop().Cases;
-      this.latestCase.death = this.detail.deathCases.pop().Cases;
-      this.latestCase.recovered = this.detail.recoveredCases.pop().Cases;
+      this.latestCase.active = this.detail.activeCases.slice(-1)[0].Cases;
+      this.latestCase.death = this.detail.deathCases.slice(-1)[0].Cases;
+      this.latestCase.recovered = this.detail.recoveredCases.slice(-1)[0].Cases;
+
       this.loading = false;
     },
     async getDetail() {
@@ -61,6 +68,7 @@ export default {
       recoveredData.data.forEach(data => {
         this.detail.recoveredCases.push(data);
       });
+
       this.getLatestCases();
     }
   },

@@ -1,9 +1,9 @@
 <template>
   <div>
     <apexchart
-      v-if="series1.length"
+      v-if="series.length"
       type="line"
-      :series="series1"
+      :series="series"
       height="500"
       :options="chartOptions"
       ref="chart"
@@ -26,10 +26,6 @@ function getDayWiseTimeSeries(baseval, count, yrange) {
       x,
       y
     });
-    data2.push({
-      x,
-      y
-    });
     lastDate = baseval;
     baseval += 86400000;
     i++;
@@ -48,28 +44,26 @@ function getNewSeries(baseval, yrange) {
     x: newDate,
     y: Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
   });
-  data2.push({
-    x: newDate,
-    y: Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
-  });
 }
 
 function resetData() {
   data1 = data1.slice(data1.length - 10, data1.length);
   data2 = data2.slice(data2.length - 10, data2.length);
 }
-
+// 777600000
 export default {
   name: "home",
+  props: ["detail"],
   data() {
     return {
-      series1: [
-        {
-          data: data1.slice()
-        }
-      ],
+      latestDate: 0,
+      series: [],
+      chartData: [],
       chartOptions: {
         chart: {
+          id: "realtime",
+          height: 350,
+          type: "line",
           animations: {
             enabled: true,
             easing: "linear",
@@ -77,27 +71,30 @@ export default {
               speed: 1000
             }
           },
-          foreColor: "#fff"
+          toolbar: {
+            show: false
+          },
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
         },
         stroke: {
-          curve: "smooth"
+          curve: "straight"
         },
-
         title: {
-          text: "Dynamic Updating Chart",
-          align: "left"
+          text: "Realtime Trend of Daily Confirmed Cases ",
+          align: "center"
         },
         markers: {
           size: 0
         },
         xaxis: {
           type: "datetime",
-          range: 777600000,
-          labels: {
-            show: true
-          }
+          // range: 777600000
         },
-        yaxis: {},
         legend: {
           show: false
         }
@@ -105,27 +102,79 @@ export default {
     };
   },
   mounted() {
-    this.intervals1();
+    this.initialiseData();
   },
   methods: {
+    getNewSeries(currentDate, index) {
+      let newDate = currentDate + 86400000;
+      this.latestDate = newDate;
+      this.chartData.push({
+        x: newDate,
+        y: this.detail[index]["Cases"]
+      });
+    },
+    initialiseData() {
+      let i = 0;
+      this.chartData = [];
+      let date = new Date(this.detail[0]["Date"]).getTime();
+      for (; i < 10; i++) {
+        let x = date;
+        let y = this.detail[i]["Cases"];
+
+        this.chartData.push({
+          x: x,
+          y: y
+        });
+        this.latestDate = date;
+        date += 86400000;
+      }
+      this.series = [
+        {
+          data: this.chartData.slice()
+        }
+      ];
+      this.interval();
+    },
+    interval() {
+      let i = 0;
+      let realTime = setInterval(_ => {
+        if(i < this.detail.length){
+        this.getNewSeries(this.latestDate, i);
+        this.$refs.chart.updateSeries([
+          {
+            name: "Cases",
+            data: this.chartData
+          }
+        ]);
+        i++;
+        }
+        else{
+          clearInterval(realTime);
+          this.initialiseData();
+        }
+      }, 1000);
+    },
+    resetData() {
+      this.chartData = this.chartData.slice(
+        this.chartData.length - 10,
+        this.chartData.length
+      );
+    },
     intervals1() {
       setInterval(_ => {
         getNewSeries(lastDate, {
           min: 10,
-          max: 90
+          max: 120
         });
         this.$refs.chart.updateSeries([
           {
             data: data1
           }
         ]);
-        
       }, 1000);
-
-      // every 60 seconds, we reset the data to prevent memory leaks
-      setInterval(_=> {
+      setInterval(_ => {
         resetData();
-        this.$refs.realtimeChart1.updateSeries(
+        this.$refs.chart.updateSeries(
           [
             {
               data: []
@@ -135,8 +184,7 @@ export default {
           true
         );
       }, 60000);
-    },
-    
+    }
   }
 };
 </script>

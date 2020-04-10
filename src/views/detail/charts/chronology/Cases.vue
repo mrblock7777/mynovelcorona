@@ -2,7 +2,8 @@
   <div>
     <apexchart
       v-if="series.length"
-      type="line"
+      ref="chart"
+      type="area"
       :series="series"
       height="500"
       :options="chartOptions"
@@ -15,18 +16,35 @@ export default {
   data() {
     return {
       series: [],
+      newCases: {},
       chartOptions: {
-        labels: [],
+        labels: ["1", "2"],
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: "straight"
+        },
         title: {
           text: "",
           align: "center"
         },
-        stroke: {
-          curve: "smooth"
-        },
         colors: ["#fcba03", "#ff8080", "#5bc76a"],
         xaxis: {
-          categories: []
+          type: "datetime",
+          categories: [],
+          title: {
+            text: "Date"
+          },
+          labels: {
+            type: "datetime",
+            hideOverlappingLabels: true
+          }
+        },
+        yaxis: {
+          title: {
+            text: "Number of Cases"
+          }
         }
       }
     };
@@ -34,36 +52,43 @@ export default {
   methods: {
     processDetails(cases) {
       let data = [];
+      let dailyCases = [];
       let chartTitle = this.chartOptions.title.text;
-      
+      this.chartOptions.xaxis = Object.assign(this.chartOptions.xaxis, {
+        categories: []
+      });
+      let days = 60;
       for (
         let i = this.detail[cases].length - 1;
-        i > this.detail[cases].length - 15;
-        i -= 2
+        i > this.detail[cases].length - days + 1;
+        i--
       ) {
         let detail = this.detail[cases][i];
-        if (!chartTitle.length) {
-          this.chartOptions.title = Object.assign(
-            {},
-            {
-              text: "Cases Trend In " + detail.Country,
-              align: "center"
-            }
-          );
-        }
+        if (detail) {
+          if (!chartTitle.length) {
+            this.chartOptions.title = Object.assign(
+              {},
+              {
+                text: `Cases Trend In ${detail.Country}  (${days} days) `,
+                align: "center"
+              }
+            );
+          }
 
-        let date = new Date(detail.Date);
-        let displayDate = date.getDate() + "/" + (date.getMonth() + 1);
-        this.chartOptions.xaxis.categories.unshift(displayDate);
-        data.unshift(detail.Cases);
+          let date = new Date(detail.Date);
+          let displayDate = date.getDate() + "/" + (date.getMonth() + 1);
+          let dataWithTime = [date.getTime(), detail.Cases]
+          data.unshift(dataWithTime);
+        }
       }
       let text = cases.replace(/[A-Z]+/g, " ").split(" ");
-
+      // console.log(this.chartOptions.xaxis);
       let title = text[0].charAt(0).toUpperCase() + text[0].substring(1);
       this.series.push({
         name: title,
         data: data
       });
+      
     }
   },
   mounted() {
