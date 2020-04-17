@@ -58,18 +58,13 @@ export default {
         categories: []
       });
       let days = 60;
-      for (
-        let i = this.detail[cases].length - 1;
-        i > this.detail[cases].length - days + 1;
-        i--
-      ) {
-        let detail = this.detail[cases][i];
+      this.detail[cases].forEach(detail =>{
         if (detail) {
           if (!chartTitle.length) {
             this.chartOptions.title = Object.assign(
               {},
               {
-                text: `Cases Trend In ${detail.Country}  (${days} days) `,
+                text: `Cases Trend In ${detail.Country} `,
                 align: "center"
               }
             );
@@ -80,7 +75,30 @@ export default {
           let dataWithTime = [date.getTime(), detail.Cases]
           data.unshift(dataWithTime);
         }
-      }
+      })
+      // for (
+      //   let i = this.detail[cases].length - 1;
+      //   i > this.detail[cases].length - days + 1;
+      //   i--
+      // ) {
+      //   let detail = this.detail[cases][i];
+      //   if (detail) {
+      //     if (!chartTitle.length) {
+      //       this.chartOptions.title = Object.assign(
+      //         {},
+      //         {
+      //           text: `Cases Trend In ${detail.Country}  (${days} days) `,
+      //           align: "center"
+      //         }
+      //       );
+      //     }
+
+      //     let date = new Date(detail.Date);
+      //     let displayDate = date.getDate() + "/" + (date.getMonth() + 1);
+      //     let dataWithTime = [date.getTime(), detail.Cases]
+      //     data.unshift(dataWithTime);
+      //   }
+      // }
       let text = cases.replace(/[A-Z]+/g, " ").split(" ");
       // console.log(this.chartOptions.xaxis);
       let title = text[0].charAt(0).toUpperCase() + text[0].substring(1);

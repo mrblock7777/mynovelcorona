@@ -1,6 +1,6 @@
 <template>
   <div>
-    <apexchart type="bar" :series="series" height="500" :options="chartOptions" />
+    <apexchart type="line" :series="series" height="500" :options="chartOptions" />
   </div>
 </template>
 <script>
@@ -10,8 +10,9 @@ export default {
     return {
       series: [],
       chartOptions: {
-        chart:{
-          toolbar:{
+        labels: [],
+        chart: {
+          toolbar: {
             show: false
           }
         },
@@ -19,6 +20,9 @@ export default {
         colors: ["#5bc76a"],
         dataLabels: {
           enabled: false
+        },
+        stroke:{
+          curve: 'smooth'
         },
         xaxis: {
           type: "datetime",
@@ -33,7 +37,7 @@ export default {
           }
         },
         title: {
-          text: "Daily New Recovered Cases for the past 30 Days",
+          text: "Daily New Recovered Cases",
           align: "center"
         }
       }
@@ -42,22 +46,22 @@ export default {
   methods: {
     processDetail() {
       let data = [];
-      for (let i = this.detail.length - 1; i > this.detail.length - 31; i--) {
+      for (let i = this.detail.length - 1; i >= 0; i--) {
         let detail = this.detail[i];
-
         if (i < this.detail.length - 1) {
-          let dailyCases = this.detail[i + 1].Cases - detail.Cases;
+          let dailyCases = Math.abs(this.detail[i + 1].Cases - detail.Cases);
           let date = new Date(this.detail[i + 1].Date);
           let dataWithDate = [date.getTime(), dailyCases];
-          if (dailyCases > 0) {
-            data.unshift(dataWithDate);
-          }
+          
+          data.unshift(dataWithDate);
         }
+        
       }
       this.series.push({
         name: "Cases",
         data: data
       });
+      console.log(this.series);
     }
   },
   mounted() {

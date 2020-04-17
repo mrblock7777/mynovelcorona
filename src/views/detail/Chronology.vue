@@ -1,11 +1,11 @@
 <template>
   <div>
     <b-row>
-      <b-col  sm >
+      <b-col md>
         <Cases :detail="detail" />
       </b-col>
-      <b-col  sm >
-        <Realtime :detail="detail.activeCases"/>
+      <b-col md>
+        <Realtime :detail="detail.activeCases" />
       </b-col>
     </b-row>
   </div>

@@ -20,7 +20,9 @@ export default {
     return {
       loading: false,
       error: false,
+      cases: [],
       summary: [],
+      countryList: [],
       overall: {
         activeCases: {
           newCase: 0,
@@ -226,10 +228,36 @@ export default {
           clearInterval(totalRecoveredCount);
         }
       }, 1000 / data.NewDeaths);
+    },
+    async getEveryCountryData(){
+      let confirmedDate = {};
+      for(let i = 0; i < this.countryList.length; i++){
+        let country = this.countryList[i];
+        let doc = await this.axios.get(this.url + `/dayone/country/${country.Slug}/status/confirmed`);
+        doc.data.forEach(data =>{
+          let date = new Date(data.Date).getTime();
+          if(!confirmedDate.hasOwnProperty(date)){
+            confirmedDate = Object.assign({}, {
+              [date] : []
+            })
+          }
+          confirmedDate[date].push(data.Cases);
+        })
+      }
+      console.log(confirmedDate);
+      
+    },
+    async getCountries(){
+      let doc = await this.axios.get(this.url+'/countries');
+      doc.data.forEach(country =>{
+        this.countryList.push(country);
+      })
+      this.getEveryCountryData();
     }
   },
   beforeMount() {
     this.getSummary();
+    this.getCountries();
   }
 };
 </script>

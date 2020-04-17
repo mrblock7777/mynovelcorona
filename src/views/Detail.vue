@@ -3,8 +3,11 @@
     <h1 class="title">Cases In {{ countryName | reformat | capitalize }}</h1>
     <div v-if="!loading">
       <Summary :overall="latestCase" />
+      <strong>Recovery Rate: {{ recoveryRate }} %</strong>
+      <br/>
+      <strong>Death Rate: {{ deathRate }} %</strong>
       <Chronology :detail="detail" />
-      <Daily :detail="detail"/>
+      <Daily :detail="detail" />
     </div>
     <p v-else>Loading Summary...</p>
   </div>
@@ -18,6 +21,7 @@ export default {
     return {
       loading: true,
       detail: {
+        confirmedCases: [],
         activeCases: [],
         deathCases: [],
         recoveredCases: []
@@ -47,7 +51,7 @@ export default {
       );
     },
     getLatestCases() {
-      this.latestCase.active = this.detail.activeCases.slice(-1)[0].Cases;
+      this.latestCase.active = this.detail.confirmedCases.slice(-1)[0].Cases;
       this.latestCase.death = this.detail.deathCases.slice(-1)[0].Cases;
       this.latestCase.recovered = this.detail.recoveredCases.slice(-1)[0].Cases;
 
@@ -55,21 +59,45 @@ export default {
     },
     async getDetail() {
       this.loading = true;
-      let activeData = await this.requestData("confirmed");
+      let activeData = [];
+      let confirmedData = await this.requestData("confirmed");
       let deathData = await this.requestData("deaths");
       let recoveredData = await this.requestData("recovered");
 
-      activeData.data.forEach(data => {
-        this.detail.activeCases.push(data);
+      recoveredData.data.forEach(data => {
+        this.detail.recoveredCases.push(data);
       });
       deathData.data.forEach(data => {
         this.detail.deathCases.push(data);
       });
-      recoveredData.data.forEach(data => {
-        this.detail.recoveredCases.push(data);
+      for (let i = 0; i < recoveredData.data.length; i++) {
+        let recovered = recoveredData.data[i];
+        let confirmed = confirmedData.data[i];
+        let infected = Math.abs(confirmed.Cases - recovered.Cases);
+        let active = Object.assign({}, confirmed, {
+          Cases: infected
+        });
+        activeData.push(active);
+      }
+      activeData.forEach(data => {
+        this.detail.activeCases.push(data);
       });
-
+      confirmedData.data.forEach(data => {
+        this.detail.confirmedCases.push(data);
+      });
       this.getLatestCases();
+    }
+  },
+  computed: {
+    recoveryRate() {
+      let recovered = this.latestCase.recovered;
+      let confirmed = this.latestCase.active;
+      return parseFloat((recovered / confirmed) * 100).toFixed(2);
+    },
+    deathRate() {
+      let death = this.latestCase.death;
+      let confirmed = this.latestCase.active;
+      return parseFloat((death / confirmed) * 100).toFixed(2);
     }
   },
   filters: {

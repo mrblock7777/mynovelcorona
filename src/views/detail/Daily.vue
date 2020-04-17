@@ -2,13 +2,15 @@
   <div>
     <h2>Daily New Cases</h2>
     <b-row>
-      <b-col sm>
-        <Confirmed :detail="detail.activeCases" />
+      <b-col md>
+        <Confirmed :detail="detail.confirmedCases" />
       </b-col>
-      <b-col sm>
+      <b-col md>
         <Death :detail="detail.deathCases" />
       </b-col>
-      <b-col sm>
+    </b-row>
+    <b-row>
+      <b-col md>
         <Recovered :detail="detail.recoveredCases" />
       </b-col>
     </b-row>
