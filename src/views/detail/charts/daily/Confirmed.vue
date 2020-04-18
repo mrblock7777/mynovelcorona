@@ -66,36 +66,37 @@ export default {
         data: data
       });
 
-      // let max = Math.max(...compare);
-      // let highest = data.find(item => {
-      //   return item.includes(max);
-      // });
+      let max = Math.max(...compare);
+      let highest = data.find(item => {
+        return item.includes(max);
+      });
 
-      // this.chartOptions.annotations = {
-      //   points: [
-      //     {
-      //       x: highest[0],
-      //       y: highest[1],
-      //       marker: {
-      //         size: 8,
-      //         fillColor: "#fff",
-      //         strokeColor: "red",
-      //         radius: 2
-      //       },
-      //       label: {
-      //         borderColor: "#FF4560",
-      //         offsetY: 0,
-      //         style: {
-      //           color: "#fff",
-      //           background: "#FF4560"
-      //         },
+      this.$refs.chart.updateOptions({
+        annotations: {
+          points: [
+            {
+              x: highest[0],
+              y: highest[1],
+              marker: {
+                size: 8,
+                fillColor: "#fff",
+                strokeColor: "#7083ff",
+                radius: 2
+              },
+              label: {
+                borderColor: "#7083ff",
+                offsetY: 0,
+                style: {
+                  color: "#fff",
+                  background: "#7083ff"
+                },
 
-      //         text: "Test"
-      //       }
-      //     }
-      //   ]
-      // };
-      // console.log(this.chartOptions);
+                text: 'Highest Daily Cases: ' + highest[1]
+              }
+            }
+          ]
+        }
+      });
     }
   },
   mounted() {

@@ -70,6 +70,11 @@ export default {
           sortable: true
         },
         {
+          key: "DeathRate",
+          label: "Death Rate (%)",
+          sortable: true
+        },
+        {
           key: "RecoveryRate",
           label: "Recovery Rate (%)",
           sortable: true
@@ -134,9 +139,15 @@ export default {
         }
         let recoveredPercentage =
           (list.TotalRecovered / list.TotalConfirmed) * 100;
+        let deathPercentage =
+          (list.TotalDeaths / list.TotalConfirmed) * 100;
         list.RecoveryRate =
           recoveredPercentage || recoveredPercentage == 0
             ? parseFloat(recoveredPercentage).toFixed(2)
+            : "N/A";
+        list.DeathRate =
+          deathPercentage || deathPercentage == 0
+            ? parseFloat(deathPercentage).toFixed(2)
             : "N/A";
 
         let buttons = {
