@@ -6,6 +6,8 @@
       <strong>Recovery Rate: {{ recoveryRate }} %</strong>
       <br/>
       <strong>Death Rate: {{ deathRate }} %</strong>
+      <br/>
+      <strong>Total active patient: {{ totalInfected }} patients</strong>
       <Chronology :detail="detail" />
       <Daily :detail="detail" />
     </div>
@@ -73,7 +75,8 @@ export default {
       for (let i = 0; i < recoveredData.data.length; i++) {
         let recovered = recoveredData.data[i];
         let confirmed = confirmedData.data[i];
-        let infected = Math.abs(confirmed.Cases - recovered.Cases);
+        let death = deathData.data[i];
+        let infected = Math.abs(confirmed.Cases - recovered.Cases - death.Cases);
         let active = Object.assign({}, confirmed, {
           Cases: infected
         });
@@ -98,6 +101,13 @@ export default {
       let death = this.latestCase.death;
       let confirmed = this.latestCase.active;
       return parseFloat((death / confirmed) * 100).toFixed(2);
+    },
+    totalInfected() {
+      let death = this.latestCase.death;
+      let confirmed = this.latestCase.active;
+      let recovered = this.latestCase.recovered;
+
+      return confirmed - recovered - death;
     }
   },
   filters: {
