@@ -1,19 +1,3 @@
-# corona
-
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+# My Novel Corona
+Corona Tracker app using COVID-19 API(https://covid19api.com/)
+Link to live site: https://mynovelcorona.herokuapp.com/
